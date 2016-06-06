@@ -3,35 +3,36 @@
 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	   xmlns:context="http://www.springframework.org/schema/context"
 	   xmlns:mvc="http://www.springframework.org/schema/mvc"
+	   xmlns:security="http://www.springframework.org/schema/security"
 	   xsi:schemaLocation="
 			http://www.springframework.org/schema/beans 
 			http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
 			http://www.springframework.org/schema/context 
 			http://www.springframework.org/schema/context/spring-context-4.0.xsd
 			http://www.springframework.org/schema/mvc 
-			http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
+			http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+			http://www.springframework.org/schema/security 
+			http://www.springframework.org/schema/security/spring-security-4.1.xsd">
 
 	<!-- Scans the classpath of this application for @Components to deploy as beans -->
-<!--  <context:annotation-config />
+ 	<context:annotation-config />
     
- -->   
- 	<context:component-scan base-package="com.rectraxx.incident.api"/>
+ 	<context:component-scan base-package="com.rectraxx.rest.api"/>
  	<context:component-scan base-package="com.rectraxx.api"/>
 	<!-- Configures the @Controller programming model -->
 	<mvc:annotation-driven />
 
-	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources/ directory -->
-<!-- <mvc:resources mapping="/css/**" location="/css/" /> 
-	<mvc:resources mapping="/fa/**" location="/fa/" /> 
-	<mvc:resources mapping="/fonts/**" location="/fonts/" /> 
-	<mvc:resources mapping="/images/**" location="/images/" /> 
-	<mvc:resources mapping="/js/**" location="/js/" /> 
-	 -->	
-	<!-- Error Definitions 
-	<bean name="/error/404.do" class="org.springframework.web.servlet.mvc.ParameterizableViewController">
-            <property name="viewName" value="error.404"/>
-    </bean>
--->	
+	<bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder">
+		<constructor-arg value="256" />
+	</bean>
+
+	<security:authentication-manager id="authenticationManager">
+		<security:authentication-provider>
+			<security:jdbc-user-service data-source-ref="iafDS" users-by-username-query="select username from users where username=? and password = ?"
+			authorities-by-username-query="select username, role from user_roles where username = ?"/>
+		</security:authentication-provider>
+	</security:authentication-manager>
+
 	<!-- Configures the JSP layout system (resolves view names returned by Controllers to JSP in certain situations) -->	
     <bean id="jspViewResolver" class="org.springframework.web.servlet.view.UrlBasedViewResolver">
         <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
