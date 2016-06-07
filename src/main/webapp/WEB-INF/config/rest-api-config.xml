@@ -14,14 +14,15 @@
 			http://www.springframework.org/schema/security 
 			http://www.springframework.org/schema/security/spring-security-4.1.xsd">
 
-	<!-- Scans the classpath of this application for @Components to deploy as beans -->
- 	<context:annotation-config />
     
  	<context:component-scan base-package="com.rectraxx.rest.api"/>
  	<context:component-scan base-package="com.rectraxx.api"/>
 	<!-- Configures the @Controller programming model -->
 	<mvc:annotation-driven />
 
+	<bean id="userDao" class="com.rectraxx.rest.api.services.UserService">
+	</bean>
+	
 	<bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder">
 		<constructor-arg value="256" />
 	</bean>
@@ -32,7 +33,23 @@
 			authorities-by-username-query="select username, role from user_roles where username = ?"/>
 		</security:authentication-provider>
 	</security:authentication-manager>
+	
+	
+	<bean id="unauthorizedEntryPoint" class="com.rectraxx.rest.api.security.UnauthorizedEntryPoint" />
+	
+	<security:http
+		entry-point-ref="unauthorizedEntryPoint"
+		authentication-manager-ref="authenticationManager"
+		create-session="stateless">
+		<security:csrf disabled="true"/>
+		<security:custom-filter ref="authenticationTokenProcessingFilter" position="PRE_AUTH_FILTER" />
+		<security:intercept-url pattern="/user/authenticate" access="permitAll" />
+	</security:http>
 
+	<bean id="authenticationTokenProcessingFilter" class="com.rectraxx.rest.api.security.AuthenticationTokenProcessingFilter">
+		<constructor-arg ref="userDao" />
+	</bean>
+	
 	<!-- Configures the JSP layout system (resolves view names returned by Controllers to JSP in certain situations) -->	
     <bean id="jspViewResolver" class="org.springframework.web.servlet.view.UrlBasedViewResolver">
         <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
@@ -40,11 +57,16 @@
         <property name="suffix" value=".jsp"/>
     </bean>
     
+    <bean id="formHttpMessageConverter" class="com.rectraxx.rest.api.security.ObjectHttpMessageConverter"/>
+    <bean id="stringHttpMessageConverter" class="org.springframework.http.converter.StringHttpMessageConverter"/>
+    
     <!-- Configure to plugin JSON as request and response in method handler -->
     <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
         <property name="messageConverters">
             <list>
                 <ref bean="jsonMessageConverter"/>
+             	<ref bean="formHttpMessageConverter"/>
+             	<ref bean="stringHttpMessageConverter"/>
             </list>
         </property>
     </bean>

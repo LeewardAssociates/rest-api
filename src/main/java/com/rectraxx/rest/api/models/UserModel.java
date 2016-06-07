@@ -60,13 +60,11 @@ public class UserModel implements Serializable, UserDetails {
 		return this.password;
 	}
 
-
 	@Override
 	public String getUsername() {
 		// TODO Auto-generated method stub
 		return this.name;
 	}
-
 
 	@Override
 	public boolean isAccountNonExpired() {
