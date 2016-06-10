@@ -12,7 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.rectraxx.rest.api.resources.Role;
 
-public class UserModel implements Serializable, UserDetails {
+public class UserModel implements UserDetails {
 
 	private String name = "";
 	private String password="";

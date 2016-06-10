@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rectraxx.api.common.util.AppUtil;
@@ -58,7 +59,7 @@ public class UserResource {
 		return new UserModel(userDetails.getUsername(), this.createRoleMap(userDetails));
 	}
 	
-	@RequestMapping(path="/authenticate", method=RequestMethod.POST, consumes="application/json")
+	@RequestMapping(path="/authenticate", method=RequestMethod.POST)
 	public TokenModel authenticate(@RequestBody UserAuthModel user, HttpServletRequest request)
 	{
 		System.out.println("request:" + request);
